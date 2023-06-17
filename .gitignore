@@ -8,3 +8,7 @@ dist/*
 Makefile
 #*.png
 __pycache__/*
+tmp/*
+*.pkl
+*.log
+*.xml
