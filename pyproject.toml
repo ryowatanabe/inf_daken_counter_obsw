@@ -5,7 +5,7 @@ description = ""
 authors = ["katao <k.katasan@gmail.com>"]
 license = "Apache License 2.0"
 readme = "README.md"
-packages = [{include = "inf_daken_counter_obsw"}]
+packages = []
 
 [tool.poetry.dependencies]
 python = "^3.11"
