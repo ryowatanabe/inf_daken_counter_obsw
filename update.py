@@ -1,4 +1,4 @@
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 import os, re, sys
 import urllib.request
 from typing import Optional

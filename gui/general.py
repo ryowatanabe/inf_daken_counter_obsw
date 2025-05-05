@@ -1,5 +1,5 @@
 import io
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 from PIL import Image
 
 from .static import icon_path,background_color

@@ -6,7 +6,7 @@ import json
 import csv
 import sys, os, math
 from collections import defaultdict
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 from tkinter import filedialog
 from lib_score_manager import ScoreManager
 import numpy as np

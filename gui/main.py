@@ -1,4 +1,4 @@
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 
 from define import define
 from .static import title,icon_path,background_color,background_color_label,selected_background_color

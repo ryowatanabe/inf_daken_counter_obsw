@@ -1,5 +1,5 @@
 import pyautogui as pgui
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 import numpy as np
 import os, sys, re
 import time
@@ -1405,7 +1405,7 @@ class DakenCounter:
         sg.theme('SystemDefault')
         menuitems = [['ファイル',['設定','OBS制御設定','配信を告知する','グラフ作成','スコアビューワ起動']],['ヘルプ',[f'{SWNAME}について', 'アップデートを確認']]]
         layout = [
-            [sg.Menubar(menuitems, key='menu')],
+            [sg.MenuBar(menuitems, key='menu')],
             [sg.Button('start', key='start', font=FONT, size=(27,1)), sg.Button('reset', key='reset', font=FONT), sg.Button('tweet', key='tweet', font=FONT), sg.Button('save', key='save_screenshot', font=FONT, tooltip='スクリーンショットを保存します。\n(F6でも撮れます)')],
             [par_text('plays:'), par_text('0', key='plays')
             ,par_text(' ', size=(5,1))

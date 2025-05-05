@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "inf-daken-counter-obsw"
+version = "2.0.44"
+description = ""
+authors = ["Ryo Watanabe <watanabe.ryo@gmail.com>"]
+license = "Apache License 2.0"
+readme = "README.md"
+packages = [{include = "inf_daken_counter_obsw"}]
+
+[tool.poetry.dependencies]
+python = "^3.13"
+pyautogui = "^0.9.54"
+numpy = "^2.2.5"
+requests = "^2.32.3"
+bs4 = "^0.0.2"
+obsws-python = "^1.7.1"
+pillow = "^11.2.1"
+imagehash = "^4.3.2"
+matplotlib = "^3.10.1"
+keyboard = "^0.13.5"
+google-cloud-storage = "^3.1.0"
+freesimplegui = "^5.2.0.post1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
