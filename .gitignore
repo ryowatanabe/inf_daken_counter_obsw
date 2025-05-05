@@ -1,14 +1,40 @@
+# 設定ファイル
 settings.json
+
+# ログファイル
+alllog.pkl
+dakenlog.pkl
+
+# 一時ファイル
 *.xml
 *.spec
 *.zip
+
+# ビルド関連
 inf_daken_counter/*
 build/*
 dist/*
 debug/*
-Makefile
-#*.png
-__pycache__/*
-tmp/*
-old/*
+
+# Pythonキャッシュ
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# 仮想環境
+venv/
+.env/
+
+# エディタ関連
+.vscode/
+.idea/
+
+# 機密情報
 service_account_info.py
+!service_account_info.templete.py
+
+# その他
+tmp/*
+log/*
+old/*
