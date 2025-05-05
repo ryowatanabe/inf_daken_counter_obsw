@@ -102,6 +102,7 @@ def play_sound_result():
 def load_resource_serialized(resourcename):
     filepath = os.path.join(resources_dirname, f'{resourcename}.res')
     if not isfile(filepath):
+        logger.debug(f'File not found: {filepath}')
         return None
     
     with open(filepath, 'rb') as f:
