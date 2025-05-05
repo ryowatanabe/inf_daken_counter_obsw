@@ -55,7 +55,7 @@ class Recognition():
             if resource.informations is None:
                 return None, None
             
-            trimmed = np_value_informations[resource.informations['difficulty']['trim']]
+            trimmed = np_value_informations[resource.informations['difficulty']['trim']].astype(np.int32)
             converted = trimmed[:,:,0]*0x10000+trimmed[:,:,1]*0x100+trimmed[:,:,2]
 
             uniques, counts = np.unique(converted, return_counts=True)
