@@ -24,8 +24,29 @@ summary_filename = 'summary.json'
 if not exists(records_basepath):
     mkdir(records_basepath)
 
+"""
+record.py
+
+このスクリプトは、ゲームの記録を管理し、保存、更新、削除を行うためのものです。
+
+主な機能:
+- 記録の保存と読み込み
+- 記録の更新と削除
+- 達成記録の生成と更新
+"""
+
 class Notebook():
+    """
+    記録を管理する基本クラス。
+
+    属性:
+    - filepath: 記録ファイルのパス
+    - json: 記録データ (辞書形式)
+    """
     def __init__(self):
+        """
+        初期化メソッド。
+        """
         self.filepath = join(records_basepath, self.filename)
 
         if not exists(self.filepath):
@@ -39,11 +60,26 @@ class Notebook():
             self.json = {}
     
     def save(self):
+        """
+        記録データをファイルに保存します。
+        """
         with open(self.filepath, 'w') as f:
             json.dump(self.json, f)
 
 class NotebookRecent(Notebook):
+    """
+    最近の記録を管理するクラス。
+
+    属性:
+    - maxcount: 保存する記録の最大数
+    """
     def __init__(self, maxcount):
+        """
+        初期化メソッド。
+
+        引数:
+        - maxcount: 保存する記録の最大数 (int)
+        """
         self.filename = recent_filename
         self.maxcount = maxcount
         super().__init__()
@@ -54,6 +90,14 @@ class NotebookRecent(Notebook):
             return
     
     def append(self, result, saved, filtered):
+        """
+        新しい記録を追加します。
+
+        引数:
+        - result: 記録データ (Result オブジェクト)
+        - saved: 保存フラグ (bool)
+        - filtered: フィルタリングフラグ (bool)
+        """
         if not 'timestamps' in self.json.keys():
             self.json['timestamps'] = []
         self.json['timestamps'].append(result.timestamp)
@@ -90,16 +134,34 @@ class NotebookRecent(Notebook):
     
     @property
     def timestamps(self):
+        """
+        記録のタイムスタンプを取得します。
+
+        戻り値:
+        - タイムスタンプのリスト
+        """
         if not 'timestamps' in self.json.keys():
             return []
         return self.json['timestamps']
     
     def get_result(self, timestamp):
+        """
+        指定されたタイムスタンプの記録を取得します。
+
+        引数:
+        - timestamp: 記録のタイムスタンプ (str)
+
+        戻り値:
+        - 記録データ (辞書形式) または None
+        """
         if not 'results' in self.json.keys() or not timestamp in self.json['results']:
             return None
         return self.json['results'][timestamp]
 
 class NotebookMusic(Notebook):
+    """
+    楽曲ごとの記録を管理するクラス。
+    """
     achievement_default = {
         'fixed': {'clear_type': None, 'dj_level': None},
         'S-RANDOM': {'clear_type': None, 'dj_level': None},
@@ -107,6 +169,12 @@ class NotebookMusic(Notebook):
     }
 
     def __init__(self, music):
+        """
+        初期化メソッド。
+
+        引数:
+        - music: 楽曲名 (str)
+        """
         """曲名をエンコード&16進数変換してファイル名にする
 
         Note:
@@ -117,6 +185,16 @@ class NotebookMusic(Notebook):
         super().__init__()
     
     def get_recordlist(self, play_mode, difficulty):
+        """
+        指定されたプレイモードと難易度の記録リストを取得します。
+
+        引数:
+        - play_mode: プレイモード (str)
+        - difficulty: 難易度 (str)
+
+        戻り値:
+        - 記録リスト (辞書形式) または None
+        """
         """対象のプレイモード・難易度のレコードのリストを取得する
 
         Args:
@@ -139,6 +217,9 @@ class NotebookMusic(Notebook):
         return target
 
     def delete(self):
+        """
+        記録ファイルを削除します。
+        """
         if exists(self.filepath):
             remove(self.filepath)
     
@@ -224,7 +305,8 @@ class NotebookMusic(Notebook):
         return updated
 
     def generate_achievement_from_histories(self, target):
-        """達成記録を過去の記録データから作成する
+        """
+        達成記録を過去の記録データから作成する
 
         Args:
             target (dict): 記録の対象部分
@@ -268,7 +350,8 @@ class NotebookMusic(Notebook):
                     achievement[achievement_key][key] = value
         
     def update_achievement(self, target, result):
-        """達成記録を更新する
+        """
+        達成記録を更新する
 
         Args:
             target (dict): 記録の対象部分
@@ -314,6 +397,12 @@ class NotebookMusic(Notebook):
         return updated
 
     def insert(self, result):
+        """
+        新しい記録を挿入します。
+
+        引数:
+        - result: 記録データ (Result オブジェクト)
+        """
         """対象のリザルトを記録に追加する
 
         Args:
@@ -367,7 +456,8 @@ class NotebookMusic(Notebook):
             self.save()
     
     def update_best_musicselect(self, values):
-        """選曲画面から取り込んだ認識結果からベスト記録を更新する
+        """
+        選曲画面から取り込んだ認識結果からベスト記録を更新する
 
         Args:
             values (dict): 認識結果
@@ -399,7 +489,8 @@ class NotebookMusic(Notebook):
         return updated
 
     def delete_history(self, play_mode, difficulty, timestamp):
-        """指定の記録を削除する
+        """
+        指定の記録を削除する
 
         対象の記録が現在のベスト記録の場合はベストから削除して
         それより古い記録に遡り、直近のベスト記録を探して
@@ -455,15 +546,22 @@ class NotebookMusic(Notebook):
         self.save()
 
 class NotebookSummary(Notebook):
+    """
+    記録の要約を管理するクラス。
+    """
     def __init__(self):
+        """
+        初期化メソッド。
+        """
         self.filename = summary_filename
         super().__init__()
     
     def import_allmusics(self, version: str):
-        """全曲の記録を取り込む
+        """
+        全楽曲の記録を取り込みます。
 
-        Args:
-            version (str): 実行したバージョン
+        引数:
+        - version: 実行したバージョン (str)
         """
         self.json = {}
         for musicname in resource.musictable['musics'].keys():
@@ -473,11 +571,12 @@ class NotebookSummary(Notebook):
         self.json['last_allimported'] = version
     
     def import_targetmusic(self, musicname: str, notebook: NotebookMusic):
-        """対象の曲の記録を取り込む
+        """
+        対象の曲の記録を取り込みます
         
-        Args:
-            musicname (str): 曲名
-            notebook (NotebookMusic): 対象曲の記録
+        引数:
+        - musicname: 曲名
+        - notebook: 対象曲の記録
         """
         if not 'musics' in self.json.keys():
             self.json['musics'] = {}
@@ -531,6 +630,12 @@ class NotebookSummary(Notebook):
                     target['misscount'] = None
     
     def count(self):
+        """
+        記録の統計情報をカウントします。
+
+        戻り値:
+        - 統計情報 (辞書形式)
+        """
         if not 'musics' in self.json.keys():
             return
 
@@ -579,6 +684,12 @@ class NotebookSummary(Notebook):
         return result
 
 def rename_allfiles(musics):
+    """
+    記録ファイルのファイル名を修正します。
+
+    引数:
+    - musics: 曲名のリスト (list[str])
+    """
     """短縮された記録ファイルのファイル名を修正する
 
     Note:
@@ -606,6 +717,12 @@ def rename_allfiles(musics):
                 logger.info(f'To(length: {len(full_filename)})\t\t{full_filename}')
 
 def rename_changemusicname():
+    """
+    曲名の誤った記録ファイルのファイル名を修正します。
+
+    戻り値:
+    - 変更された曲名のリスト (list[tuple[str, str]]) または None
+    """
     """曲名の誤っていた記録ファイルのファイル名を修正する
 
     Note:

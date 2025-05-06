@@ -32,8 +32,30 @@ try:
 except Exception:
     SWVER = "v0.0.0"
 
+"""
+update.py
+
+このスクリプトは、アプリケーションのアップデートを管理するためのものです。
+GitHub リポジトリから最新バージョンを取得し、必要に応じて更新を行います。
+
+主な機能:
+- 最新バージョンの取得
+- ZIP ファイルのダウンロードと解凍
+- GUI を使用した進行状況の表示
+"""
+
 class Updater:
+    """
+    アプリケーションのアップデートを管理するクラス。
+    """
+
     def get_latest_version(self):
+        """
+        GitHub リポジトリから最新バージョンを取得します。
+
+        戻り値:
+        - 最新バージョンのタグ名 (str)
+        """
         self.ico=self.ico_path('icon.ico')
         ret = None
         url = 'https://github.com/dj-kata/inf_daken_counter_obsw/tags'
@@ -46,6 +68,12 @@ class Updater:
         return ret
 
     def update_from_url(self, url):
+        """
+        指定された URL から ZIP ファイルをダウンロードし、解凍して更新を行います。
+
+        引数:
+        - url: ZIP ファイルのダウンロード URL (str)
+        """
         filename = 'tmp/tmp.zip'
         self.window['txt_info'].update('ファイルDL中')
 
@@ -82,6 +110,15 @@ class Updater:
 
     # icon用
     def ico_path(self, relative_path):
+        """
+        アイコンファイルのパスを取得します。
+
+        引数:
+        - relative_path: アイコンファイルの相対パス (str)
+
+        戻り値:
+        - 絶対パス (str)
+        """
         try:
             base_path = sys._MEIPASS
         except Exception:
@@ -89,6 +126,9 @@ class Updater:
         return os.path.join(base_path, relative_path)
 
     def gui(self):
+        """
+        アップデート進行状況を表示する GUI を初期化します。
+        """
         layout = [
             [sg.Text('', key='txt_info')],
             [sg.ProgressBar(100, key='prog', size=(30, 15))],
@@ -96,6 +136,12 @@ class Updater:
         self.window = sg.Window('infdc update manager', layout, grab_anywhere=True,return_keyboard_events=True,resizable=False,finalize=True,enable_close_attempted_event=True,icon=self.ico)
 
     def main(self, url):
+        """
+        アップデート処理のメインロジック。
+
+        引数:
+        - url: ZIP ファイルのダウンロード URL (str)
+        """
         self.gui()
         th = threading.Thread(target=self.update_from_url, args=(url,), daemon=True)
         th.start()

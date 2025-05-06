@@ -18,7 +18,21 @@ SRCCOPY = 0x00CC0020
 DIB_RGB_COLORS = 0
 PW_CLIENTONLY = 1
 
+"""
+screenshot.py
+
+このスクリプトは、スクリーンショットのキャプチャや画像処理を行うためのものです。
+
+主な機能:
+- スクリーンショットの取得
+- 取得した画像の加工や保存
+- スクリーン情報の取得
+"""
+
 class BITMAPINFOHEADER(ctypes.Structure):
+    """
+    スクリーンショットのキャプチャに必要なビットマップ情報のヘッダーを定義する構造体。
+    """
     _fields_ = [
         ('biSize', wintypes.DWORD),
         ('biWidth', wintypes.LONG),
@@ -34,6 +48,9 @@ class BITMAPINFOHEADER(ctypes.Structure):
     ]
 
 class RGBQUAD(ctypes.Structure):
+    """
+    RGB カラー情報を格納する構造体。
+    """
     _fields_ = [
         ('rgbRed', ctypes.c_byte),
         ('rgbGreen', ctypes.c_byte),
@@ -42,20 +59,43 @@ class RGBQUAD(ctypes.Structure):
     ]
 
 class BITMAPINFO(ctypes.Structure):
+    """
+    ビットマップ情報を格納する構造体。
+    """
     _fields_ = [
         ('bmiHeader', BITMAPINFOHEADER),
         ('bmiColors', ctypes.POINTER(RGBQUAD))
     ]
 
 class Screen:
+    """
+    スクリーンショットの画像データとファイル名を格納するクラス。
+    """
     def __init__(self, np_value, filename):
+        """
+        初期化メソッド。
+
+        引数:
+        - np_value: 画像データ (numpy array)
+        - filename: ファイル名 (str)
+        """
         self.np_value = np_value
 
         self.original = Image.fromarray(np_value)
         self.filename = filename
 
 class Capture:
+    """
+    スクリーンショットをキャプチャするためのクラス。
+    """
     def __init__(self, width, height):
+        """
+        初期化メソッド。
+
+        引数:
+        - width: キャプチャする幅 (int)
+        - height: キャプチャする高さ (int)
+        """
         self.width = width
         self.height = height
 
@@ -77,12 +117,25 @@ class Capture:
         self.buffer = create_string_buffer(self.height * self.width * 3)
     
     def shot(self, left, top):
+        """
+        指定された位置のスクリーンショットを取得します。
+
+        引数:
+        - left: 左上の x 座標 (int)
+        - top: 左上の y 座標 (int)
+
+        戻り値:
+        - 取得した画像データ (numpy array)
+        """
         windll.gdi32.BitBlt(self.screen_copy, 0, 0, self.width, self.height, self.screen, left, top, SRCCOPY)
         windll.gdi32.GetDIBits(self.screen_copy, self.bitmap, 0, self.height, ctypes.pointer(self.buffer), ctypes.pointer(self.bmi), DIB_RGB_COLORS)
 
         return np.array(bytearray(self.buffer)).reshape(self.height, self.width, 3)
 
     def __del__(self):
+        """
+        リソースを解放するデストラクタ。
+        """
         windll.gdi32.DeleteObject(self.bitmap)
         windll.gdi32.DeleteDC(self.screen_copy)
         windll.gdi32.DeleteDC(self.screen)
@@ -90,20 +143,35 @@ class Capture:
         logger.debug('Called Screenshot destuctor.')
 
 class Screenshot:
+    """
+    スクリーンショットの管理と操作を行うクラス。
+    """
     xy = None
     screentable = load_resource_serialized('get_screen')
     np_value = None
 
     def __init__(self):
+        """
+        初期化メソッド。
+        """
         self.checkscreens = [(screen, (areas['left'], areas['top']), Capture(areas['width'], areas['height']), self.screentable[screen]) for screen, areas in define.screens.items()]
         self.capture = Capture(define.width, define.height)
 
     def __del__(self):
+        """
+        リソースを解放するデストラクタ。
+        """
         for screen, pos, capture, value in self.checkscreens:
             del capture
         del self.capture
 
     def get_screen(self):
+        """
+        現在のスクリーン情報を取得します。
+
+        戻り値:
+        - スクリーン情報 (str) または None
+        """
         if self.xy is None:
             return None
         
@@ -121,6 +189,12 @@ class Screenshot:
         return results[0]
 
     def shot(self):
+        """
+        スクリーンショットを取得します。
+
+        戻り値:
+        - 成功した場合は True、それ以外は False
+        """
         if self.xy is None:
             return False
         
@@ -128,18 +202,39 @@ class Screenshot:
         return True
 
     def get_image(self):
+        """
+        取得したスクリーンショットを PIL.Image オブジェクトとして返します。
+
+        戻り値:
+        - 画像データ (PIL.Image) または None
+        """
         if self.np_value is None:
             return None
         
         return Image.fromarray(self.np_value)
 
     def get_resultscreen(self):
+        """
+        スクリーンショットの結果を Screen オブジェクトとして返します。
+
+        戻り値:
+        - Screen オブジェクト
+        """
         now = datetime.now()
         filename = f"{now.strftime('%Y%m%d-%H%M%S-%f')}.png"
 
         return Screen(self.np_value, filename)
 
 def open_screenimage(filepath):
+    """
+    指定されたファイルパスからスクリーンショット画像を開きます。
+
+    引数:
+    - filepath: ファイルパス (str)
+
+    戻り値:
+    - Screen オブジェクト または None
+    """
     if not exists(filepath):
         return None
     

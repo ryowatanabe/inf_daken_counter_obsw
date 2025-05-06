@@ -46,7 +46,23 @@ musicselect_rivals_fillbox = (
 
 )
 
+"""
+storage.py
+
+このスクリプトは、Google Cloud Storage を利用して画像やリソースを管理するためのものです。
+主に、画像のアップロード、ダウンロード、削除を行います。
+
+主な機能:
+- バケットへの接続
+- 画像やリソースのアップロードとダウンロード
+- 必要に応じた画像のトリミングや加工
+"""
+
 class StorageAccessor():
+    """
+    Google Cloud Storage を操作するためのクラス。
+    バケットへの接続や、画像・リソースのアップロード、ダウンロードを行います。
+    """
     client = None
     bucket_informations = None
     bucket_details = None
@@ -55,6 +71,9 @@ class StorageAccessor():
     blob_musics = None
 
     def connect_client(self):
+        """
+        Google Cloud Storage クライアントに接続します。
+        """
         if self.client is not None:
             return
         
@@ -66,6 +85,9 @@ class StorageAccessor():
         logger.debug('connect client')
 
     def connect_bucket_informations(self):
+        """
+        informations バケットに接続します。
+        """
         if self.client is None:
             self.connect_client()
         if self.client is None:
@@ -78,6 +100,9 @@ class StorageAccessor():
             logger.exception(ex)
 
     def connect_bucket_details(self):
+        """
+        details バケットに接続します。
+        """
         if self.client is None:
             self.connect_client()
         if self.client is None:
@@ -90,6 +115,9 @@ class StorageAccessor():
             logger.exception(ex)
     
     def connect_bucket_musicselect(self):
+        """
+        musicselect バケットに接続します。
+        """
         if self.client is None:
             self.connect_client()
         if self.client is None:
@@ -102,6 +130,9 @@ class StorageAccessor():
             logger.exception(ex)
     
     def connect_bucket_resources(self):
+        """
+        resources バケットに接続します。
+        """
         if self.client is None:
             self.connect_client()
         if self.client is None:
@@ -114,12 +145,26 @@ class StorageAccessor():
             logger.exception(ex)
 
     def upload_image(self, blob, image):
+        """
+        指定されたバケットに画像をアップロードします。
+
+        引数:
+        - blob: アップロード先のバケットオブジェクト
+        - image: アップロードする画像 (PIL.Image)
+        """
         bytes = io.BytesIO()
         image.save(bytes, 'PNG')
         blob.upload_from_file(bytes, True)
         bytes.close()
 
     def upload_informations(self, object_name, image):
+        """
+        informations バケットに画像をアップロードします。
+
+        引数:
+        - object_name: アップロードするオブジェクト名
+        - image: アップロードする画像 (PIL.Image)
+        """
         if self.bucket_informations is None:
             self.connect_bucket_informations()
         if self.bucket_informations is None:
@@ -133,6 +178,13 @@ class StorageAccessor():
             logger.exception(ex)
 
     def upload_details(self, object_name, image):
+        """
+        details バケットに画像をアップロードします。
+
+        引数:
+        - object_name: アップロードするオブジェクト名
+        - image: アップロードする画像 (PIL.Image)
+        """
         if self.bucket_details is None:
             self.connect_bucket_details()
         if self.bucket_details is None:
@@ -146,6 +198,13 @@ class StorageAccessor():
             logger.exception(ex)
 
     def upload_musicselect(self, object_name, image):
+        """
+        musicselect バケットに画像をアップロードします。
+
+        引数:
+        - object_name: アップロードするオブジェクト名
+        - image: アップロードする画像 (PIL.Image)
+        """
         if self.bucket_musicselect is None:
             self.connect_bucket_musicselect()
         if self.bucket_musicselect is None:
@@ -159,15 +218,16 @@ class StorageAccessor():
             logger.exception(ex)
 
     def start_uploadcollection(self, result, image, force):
-        """収集画像をアップロードする
+        """
+        収集画像をアップロードします。
 
-        Args:
-            result (Result): 対象のリザルト(result.py)
-            image (Image): 対象のリザルト画像(PIL.Image)
-            force (bool): 強制アップロード
+        引数:
+        - result: 対象のリザルト (Result クラス)
+        - image: 対象のリザルト画像 (PIL.Image)
+        - force: 強制アップロードのフラグ (bool)
 
-        Returns:
-            bool: informationsとdetails両方アップロードした
+        戻り値:
+        - informations と details の両方をアップロードしたかどうか (bool)
         """
         self.connect_client()
         if self.client is None:
@@ -215,10 +275,11 @@ class StorageAccessor():
         return informations_trim and details_trim
     
     def start_uploadmusicselect(self, image):
-        """選曲画面の収集画像をアップロードする
+        """
+        選曲画面の収集画像をアップロードします。
 
-        Args:
-            image (Image): 対象のリザルト画像(PIL.Image)
+        引数:
+        - image: 対象のリザルト画像 (PIL.Image)
         """
         self.connect_client()
         if self.client is None:
@@ -232,6 +293,13 @@ class StorageAccessor():
         Thread(target=self.upload_musicselect, args=(object_name, trim,)).start()
     
     def upload_resource(self, resourcename, targetfilepath):
+        """
+        resources バケットにリソースをアップロードします。
+
+        引数:
+        - resourcename: アップロードするリソース名
+        - targetfilepath: アップロードするファイルのパス
+        """
         if self.bucket_resources is None:
             self.connect_bucket_resources()
         if self.bucket_resources is None:
@@ -245,6 +313,15 @@ class StorageAccessor():
             logger.exception(ex)
     
     def get_resource_timestamp(self, resourcename):
+        """
+        指定されたリソースのタイムスタンプを取得します。
+
+        引数:
+        - resourcename: 対象のリソース名
+
+        戻り値:
+        - タイムスタンプ (str) または None
+        """
         if self.bucket_resources is None:
             self.connect_bucket_resources()
         if self.bucket_resources is None:
@@ -259,6 +336,16 @@ class StorageAccessor():
         return None
     
     def download_resource(self, resourcename, targetfilepath):
+        """
+        resources バケットからリソースをダウンロードします。
+
+        引数:
+        - resourcename: ダウンロードするリソース名
+        - targetfilepath: 保存先のファイルパス
+
+        戻り値:
+        - ダウンロード成功 (bool)
+        """
         if self.bucket_resources is None:
             self.connect_bucket_resources()
         if self.bucket_resources is None:
@@ -276,6 +363,13 @@ class StorageAccessor():
         return True
 
     def save_image(self, basepath, blob):
+        """
+        バケット内の画像を保存します。
+
+        引数:
+        - basepath: 保存先のディレクトリパス
+        - blob: 対象のバケットオブジェクト
+        """
         if not exists(basepath):
             mkdir(basepath)
         
@@ -285,6 +379,12 @@ class StorageAccessor():
         image.save(filepath)
 
     def download_and_delete_all(self, basedir):
+        """
+        バケット内のすべての画像をダウンロードし、削除します。
+
+        引数:
+        - basedir: 保存先のディレクトリパス
+        """
         self.connect_client()
         if self.client is None:
             print('connect client failed')
@@ -295,7 +395,7 @@ class StorageAccessor():
 
         informations_dirpath = join(basedir, informations_dirname)
         details_dirpath = join(basedir, details_dirname)
-        musicselect_dirpath = join(basedir, musicselect_dirname)
+        musicselect_dirpath = join(basedir, musicselect_dirpath)
 
         count = 0
         blobs = self.client.list_blobs(bucket_name_informations)
