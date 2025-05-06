@@ -36,11 +36,17 @@ class OBSSocket():
         self.passwd = passWord
         self.inf_source = inf_source
         self.dst_screenshot = dst_screenshot
-        self.ws = obsws.ReqClient(host=self.host,port=self.port,password=self.passwd)
-        self.active = True
-        self.ev = obsws.EventClient(host=self.host,port=self.port,password=self.passwd)
-        self.ev.callback.register([self.on_exit_started,])
-        logger.debug(f'host:{self.host}, port:{self.port}, pass:{self.passwd}')
+        try:
+            self.ws = obsws.ReqClient(host=self.host, port=self.port, password=self.passwd)
+            self.ev = obsws.EventClient(host=self.host, port=self.port, password=self.passwd)
+            self.ev.callback.register([self.on_exit_started,])
+            logger.debug(f'host:{self.host}, port:{self.port}, pass:{self.passwd}')
+            self.active = True
+        except Exception as ex:
+            logger.error(f"Failed to connect to OBS: {ex}")
+            self.ws = None
+            self.ev = None
+            self.active = False
 
     def close(self):
         try:
@@ -176,8 +182,8 @@ class OBSSocket():
         try:
             self.ws.set_current_scene_collection(scene_collection)
             return True
-        except Exception:
-            logger.debug(traceback.format_exc())
+        except Exception as ex:
+            logger.error(ex)
             return False
 
 if __name__ == "__main__":

@@ -19,7 +19,7 @@ def setup_logging():
     log_level = getattr(logging, args.LOG_LEVEL.upper(), logging.INFO)
     logging.basicConfig(
         level=log_level,
-        format="%(asctime)s %(levelname)s [%(module)s] %(message)s"
+        format="%(asctime)s %(levelname)s [%(module)s / %(filename)s:%(lineno)d] %(message)s"
     )
 
 class LogHelper():

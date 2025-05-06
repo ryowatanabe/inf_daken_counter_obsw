@@ -1,3 +1,4 @@
+import log_helper
 import pyautogui as pgui
 import FreeSimpleGUI as sg
 import numpy as np
@@ -844,7 +845,7 @@ class DakenCounter:
         ret = False
         if re.search('www.youtube.com.*v=', url):
             ret = re.sub('.*v=', '', url)
-        elif re.search('livestreaming\Z', url):
+        elif re.search(r'livestreaming\Z', url):
             ret = url.split('/')[-2]
         return ret
 
@@ -1177,7 +1178,7 @@ class DakenCounter:
             regular_url = f"https://www.youtube.com/watch?v={liveid}"
             r = requests.get(regular_url)
             soup = BeautifulSoup(r.text,features="html.parser")
-            title = re.sub(' - YouTube\Z', '', soup.find('title').text)
+            title = re.sub(r' - YouTube\Z', '', soup.find('title').text)
             #print(f"liveid = {liveid}")
             print(f"配信タイトル:\n{title}\n")
             print(f"ツイート用:\n{title}\n{regular_url}\n")
@@ -1223,7 +1224,7 @@ class DakenCounter:
                         series = re.search(query, title).group()
                     basetitle = title.replace(series, '')
                     basetitle = re.sub('【[^【】]*】', '', basetitle)
-                    basetitle = re.sub('\[[^\[\]]*]', '', basetitle)
+                    basetitle = re.sub(r'\[[^\[\]]*]', '', basetitle)
                     self.write_series_xml(series, basetitle.strip())
                     window.close()
                     break

@@ -81,8 +81,12 @@ class StorageAccessor():
             logger.info('no define service_account_info')
             return
         
-        self.client = storage.Client.from_service_account_info(service_account_info)
-        logger.debug('connect client')
+        try:
+            self.client = storage.Client.from_service_account_info(service_account_info)
+            logger.debug('connect client')
+        except Exception as ex:
+            logger.error(f'Failed to connect client: {ex}')
+            self.client = None
 
     def connect_bucket_informations(self):
         """
@@ -97,7 +101,7 @@ class StorageAccessor():
             self.bucket_informations = self.client.get_bucket(bucket_name_informations)
             logger.debug('connect bucket informations')
         except Exception as ex:
-            logger.exception(ex)
+            logger.error(ex)
 
     def connect_bucket_details(self):
         """
@@ -112,7 +116,7 @@ class StorageAccessor():
             self.bucket_details = self.client.get_bucket(bucket_name_details)
             logger.debug('connect bucket details')
         except Exception as ex:
-            logger.exception(ex)
+            logger.error(ex)
     
     def connect_bucket_musicselect(self):
         """
@@ -127,7 +131,7 @@ class StorageAccessor():
             self.bucket_musicselect = self.client.get_bucket(bucket_name_musicselect)
             logger.debug('connect bucket musicselect')
         except Exception as ex:
-            logger.exception(ex)
+            logger.error(ex)
     
     def connect_bucket_resources(self):
         """
@@ -142,7 +146,7 @@ class StorageAccessor():
             self.bucket_resources = self.client.get_bucket(bucket_name_resources)
             logger.debug('connect bucket resources')
         except Exception as ex:
-            logger.exception(ex)
+            logger.error(ex)
 
     def upload_image(self, blob, image):
         """
@@ -175,7 +179,7 @@ class StorageAccessor():
             self.upload_image(blob, image)
             logger.debug(f'upload information image {object_name}')
         except Exception as ex:
-            logger.exception(ex)
+            logger.error(ex)
 
     def upload_details(self, object_name, image):
         """
@@ -195,7 +199,7 @@ class StorageAccessor():
             self.upload_image(blob, image)
             logger.debug(f'upload details image {object_name}')
         except Exception as ex:
-            logger.exception(ex)
+            logger.error(ex)
 
     def upload_musicselect(self, object_name, image):
         """
@@ -215,7 +219,7 @@ class StorageAccessor():
             self.upload_image(blob, image)
             logger.debug(f'upload musicselect image {object_name}')
         except Exception as ex:
-            logger.exception(ex)
+            logger.error(ex)
 
     def start_uploadcollection(self, result, image, force):
         """
@@ -310,7 +314,7 @@ class StorageAccessor():
             blob.upload_from_filename(targetfilepath)
             logger.debug(f'upload resource {targetfilepath}')
         except Exception as ex:
-            logger.exception(ex)
+            logger.error(ex)
     
     def get_resource_timestamp(self, resourcename):
         """
@@ -331,7 +335,7 @@ class StorageAccessor():
             blob = self.bucket_resources.get_blob(resourcename)
             return str(blob.updated)
         except Exception as ex:
-            logger.exception(ex)
+            logger.error(ex)
         
         return None
     
@@ -357,7 +361,7 @@ class StorageAccessor():
             blob.download_to_filename(targetfilepath)
             logger.debug('download resource {targetfilepath}')
         except Exception as ex:
-            logger.exception(ex)
+            logger.error(ex)
             return False
         
         return True
